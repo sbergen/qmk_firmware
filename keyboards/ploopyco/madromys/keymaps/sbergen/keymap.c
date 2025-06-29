@@ -38,6 +38,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         default:
+            // Cancel drag scroll when pressing any button
+            if (record->event.pressed) {
+                set_drag_scroll(false);
+                // Don't set drag_scroll_held to false,
+                // as otherwise we toggle on drag scroll when released.
+            }
             return true;
     }
 }
