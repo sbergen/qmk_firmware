@@ -1,3 +1,9 @@
+# Modifications in this fork
+
+* Ploopy Adept (`keymaps/sbergen`):
+    * Drag scroll works as both momentary and toggle (based on `TAPPING_TERM`)
+    * Small config changes: invert drag scroll, tweak drag scroll sensitivity
+
 # Quantum Mechanical Keyboard Firmware
 
 [![Current Version](https://img.shields.io/github/tag/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/tags)

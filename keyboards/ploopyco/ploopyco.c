@@ -132,6 +132,10 @@ void toggle_drag_scroll(void) {
     is_drag_scroll ^= 1;
 }
 
+void set_drag_scroll(bool enabled) {
+    is_drag_scroll = enabled;
+}
+
 void cycle_dpi(void) {
     keyboard_config.dpi_config = (keyboard_config.dpi_config + 1) % DPI_OPTION_SIZE;
     eeconfig_update_kb(keyboard_config.raw);
