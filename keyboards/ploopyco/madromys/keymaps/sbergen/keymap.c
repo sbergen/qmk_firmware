@@ -6,7 +6,13 @@ static deferred_token drag_scroll_hold_timer;
 // Indicates that we are in hold mode, and not tapping
 static bool drag_scroll_held = false;
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[0] = LAYOUT(KC_BTN4, KC_BTN5, DRAG_SCROLL, KC_BTN2, KC_BTN1, KC_BTN3)};
+// clang-format off
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    [0] = LAYOUT(
+        KC_BTN4, KC_BTN5, DRAG_SCROLL, KC_BTN2,
+        KC_BTN1,                       KC_BTN3)
+};
+// clang-format on
 
 uint32_t hold_drag_scroll(uint32_t trigger_time, void *cb_arg) {
     drag_scroll_held = true;
