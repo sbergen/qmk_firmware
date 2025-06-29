@@ -2,6 +2,7 @@
 
 * Ploopy Adept (`keymaps/sbergen`):
     * Drag scroll works as both momentary and toggle (based on `TAPPING_TERM`)
+    * Drag scroll in horizontal direction is gated (`PLOOPY_DRAGSCROLL_GATE_H`)
     * Small config changes: invert drag scroll, tweak drag scroll sensitivity
 
 # Quantum Mechanical Keyboard Firmware

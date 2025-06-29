@@ -17,6 +17,7 @@
  */
 
 #include "ploopyco.h"
+#include <math.h>
 #include "analog.h"
 #include "opt_encoder.h"
 
@@ -51,6 +52,9 @@
 #ifndef PLOOPY_DRAGSCROLL_DIVISOR_V
 #    define PLOOPY_DRAGSCROLL_DIVISOR_V 8.0
 #endif
+#ifndef PLOOPY_DRAGSCROLL_GATE_H
+#    define PLOOPY_DRAGSCROLL_GATE_H 4
+#endif
 #ifndef ENCODER_BUTTON_ROW
 #    define ENCODER_BUTTON_ROW 0
 #endif
@@ -67,6 +71,7 @@ bool  is_scroll_clicked    = false;
 bool  is_drag_scroll       = false;
 float scroll_accumulated_h = 0;
 float scroll_accumulated_v = 0;
+bool  scroll_h_gated       = true;
 
 #ifdef ENCODER_ENABLE
 uint16_t lastScroll        = 0; // Previous confirmed wheel event
@@ -129,11 +134,16 @@ void encoder_driver_task(void) {
 #endif
 
 void toggle_drag_scroll(void) {
-    is_drag_scroll ^= 1;
+    set_drag_scroll(!is_drag_scroll);
 }
 
 void set_drag_scroll(bool enabled) {
-    is_drag_scroll = enabled;
+    if (enabled != is_drag_scroll) {
+        is_drag_scroll       = enabled;
+        scroll_accumulated_h = 0;
+        scroll_accumulated_v = 0;
+        scroll_h_gated       = true;
+    }
 }
 
 void cycle_dpi(void) {
@@ -148,16 +158,31 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
         scroll_accumulated_v += (float)mouse_report.y / PLOOPY_DRAGSCROLL_DIVISOR_V;
 
         // Assign integer parts of accumulated scroll values to the mouse report
-        mouse_report.h = (int8_t)scroll_accumulated_h;
 #ifdef PLOOPY_DRAGSCROLL_INVERT
         mouse_report.v = -(int8_t)scroll_accumulated_v;
 #else
         mouse_report.v = (int8_t)scroll_accumulated_v;
 #endif
+        if (!scroll_h_gated) {
+            mouse_report.h = (int8_t)scroll_accumulated_h;
+        }
 
         // Update accumulated scroll values by subtracting the integer parts
-        scroll_accumulated_h -= (int8_t)scroll_accumulated_h;
         scroll_accumulated_v -= (int8_t)scroll_accumulated_v;
+
+        if (scroll_h_gated && fabsf(scroll_accumulated_h) > PLOOPY_DRAGSCROLL_GATE_H) {
+            scroll_h_gated = false;
+
+            if (scroll_accumulated_h < 0) {
+                scroll_accumulated_h += PLOOPY_DRAGSCROLL_GATE_H;
+            } else {
+                scroll_accumulated_h -= PLOOPY_DRAGSCROLL_GATE_H;
+            }
+        }
+
+        if (!scroll_h_gated) {
+            scroll_accumulated_h -= (int8_t)scroll_accumulated_h;
+        }
 
         // Clear the X and Y values of the mouse report
         mouse_report.x = 0;
